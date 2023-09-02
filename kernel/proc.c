@@ -126,6 +126,7 @@ found:
   memset(&p->context, 0, sizeof(p->context));
   p->context.ra = (uint64)forkret;
   p->context.sp = p->kstack + PGSIZE;
+  p->syscall_trace = 0;   // 在此处添加trace初始值0 fork          ！！！！！
 
   return p;
 }
@@ -290,6 +291,8 @@ fork(void)
   np->cwd = idup(p->cwd);
 
   safestrcpy(np->name, p->name, sizeof(p->name));
+
+  np->syscall_trace = p->syscall_trace; //HERE!! 子进程继承父进程的trace号 ！！！！
 
   pid = np->pid;
 
@@ -692,4 +695,20 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+
+
+// 实现计算进程数量函数
+
+uint64
+count_process(void) { // added function for counting used process slots (lab2)
+  uint64 cnt = 0;
+  for(struct proc *p = proc; p < &proc[NPROC]; p++) {
+    // acquire(&p->lock);
+    // 不需要锁进程 proc 结构，只需要读取进程列表，不需要写
+    if(p->state != UNUSED) { // 不是 UNUSED 的进程位，就是已经分配的
+        cnt++;
+    }
+  }
+  return cnt;
 }

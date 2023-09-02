@@ -6,6 +6,7 @@
 #include "memlayout.h"
 #include "spinlock.h"
 #include "proc.h"
+#include "sysinfo.h"
 
 uint64
 sys_exit(void)
@@ -94,4 +95,35 @@ sys_uptime(void)
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+// trace 系统调用
+uint64
+sys_trace(void)
+{
+  int mask;
+  if (argint(0, &mask) < 0)  // 读取进程的trapframe 获得mask参数 a0寄存器
+    return -1;
+  myproc()->syscall_trace = mask;
+  return 0;
+}
+
+
+// sysinfo 系统调用
+uint64
+sys_sysinfo(void) {
+  // 从用户态读取一个指针，用来存放sysinfo结构缓冲区
+  uint64 addr;
+  if (argaddr(0, &addr) < 0) {
+    return -1;
+  }
+
+  struct sysinfo syinfo;
+  syinfo.freemem = count_free_mem(); // 在kalloc.c
+  syinfo.nproc = count_process(); // 在proc.c
+  
+  if (copyout(myproc()->pagetable, addr, (char*)&syinfo, sizeof(syinfo)) < 0) {
+    return -1;
+  }
+  return 0;
 }
