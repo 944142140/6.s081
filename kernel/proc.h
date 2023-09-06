@@ -104,4 +104,6 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
   uint64 syscall_trace;        // Mask for syscall tracing (添加的用于标识追踪system call
+
+  pagetable_t kernelpgtbl;      // 每个进程所特有的kenel page table 原来是共享的
 };

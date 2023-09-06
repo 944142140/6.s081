@@ -157,10 +157,14 @@ int             uartgetc(void);
 
 // vm.c
 void            kvminit(void);
+pagetable_t     kvminit_newpgtbl(); //新添加的初始化进程内核页表函数
 void            kvminithart(void);
-uint64          kvmpa(uint64);
-void            kvmmap(uint64, uint64, uint64, int);
-int             mappages(pagetable_t, uint64, uint64, uint64, int);
+uint64          kvmpa(pagetable_t, uint64); // 添加pagetable_t参数 原来是全局变量kernel pagetable
+void            kvmmap(pagetable_t, uint64, uint64, uint64, int); // 添加pagetable_t参数 原来是全局变量kernel pagetable
+void			kvm_free_kernelpgtbl(pagetable_t); // void *kget_freelist(void); // used for tracing purposes in exp2
+int             mappages(pagetable_t, uint64, uint64, uint64, int); // 添加pagetable_t参数 原来是全局变量kernel pagetable
+int             kvmcopymappings(pagetable_t, pagetable_t, uint64, uint64); //新添加的拷贝页表工具函数
+uint64          kvmdealloc(pagetable_t, uint64, uint64); //与uvmdealloc功能类似，将程序内存由oldsz缩减至newsz。区别在于不释放实际内存。
 pagetable_t     uvmcreate(void);
 void            uvminit(pagetable_t, uchar *, uint);
 uint64          uvmalloc(pagetable_t, uint64, uint64);
@@ -173,12 +177,16 @@ uint64          walkaddr(pagetable_t, uint64);
 int             copyout(pagetable_t, uint64, char *, uint64);
 int             copyin(pagetable_t, char *, uint64, uint64);
 int             copyinstr(pagetable_t, char *, uint64, uint64);
+int             vmprint(pagetable_t pagetable);               //   打印页表函数添加声明
 
 // plic.c
 void            plicinit(void);
 void            plicinithart(void);
 int             plic_claim(void);
 void            plic_complete(int);
+
+// sprintf.c
+int             snprintf(char*, int, char*, ...);
 
 // virtio_disk.c
 void            virtio_disk_init(void);
