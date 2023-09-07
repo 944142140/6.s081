@@ -26,6 +26,8 @@ int uptime(void);
 int trace(int); //here
 struct sysinfo; // !!!!
 int sysinfo(struct sysinfo *); //here
+int sigalarm(int, void (*handler)()); // 添加系统调用
+int sigreturn(void); // 添加系统调用
 
 // ulib.c
 int stat(const char*, struct stat*);

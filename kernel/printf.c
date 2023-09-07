@@ -132,3 +132,12 @@ printfinit(void)
   initlock(&pr.lock, "pr");
   pr.locking = 1;
 }
+
+void backtrace() {
+  uint64 fp = r_fp();
+  while (fp != PGROUNDUP(fp)) { // 一个页表存储栈 高位向低位生长 PGR拉到最高位 表示到达栈底了
+    uint64 ra = *(uint64*)(fp - 8); // 第一个8字节 return address
+    printf("%p\n", ra);
+    fp = *(uint64*)(fp - 16); // 上一个函数返回地址 previous fp
+  }
+}

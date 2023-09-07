@@ -59,6 +59,8 @@ sys_sleep(void)
   int n;
   uint ticks0;
 
+  backtrace(); // 打印栈回溯
+
   if(argint(0, &n) < 0)
     return -1;
   acquire(&tickslock);
@@ -126,4 +128,20 @@ sys_sysinfo(void) {
     return -1;
   }
   return 0;
+}
+
+// sysproc.c
+uint64 sys_sigalarm(void) {
+  int n;
+  uint64 fn;
+  if(argint(0, &n) < 0)
+    return -1;
+  if(argaddr(1, &fn) < 0)
+    return -1;
+  
+  return sigalarm(n, (void(*)())(fn));
+}
+
+uint64 sys_sigreturn(void) {
+	return sigreturn();
 }

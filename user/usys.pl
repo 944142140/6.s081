@@ -37,7 +37,9 @@ entry("sbrk");
 entry("sleep");
 entry("uptime");
 entry("trace"); # here 添加systrace的入口中断
-entry("sysinfo")  # 添加sysinfo入口
+entry("sysinfo");  # 添加sysinfo入口
+entry("sigalarm");  # 添加sigalarm中断入口
+entry("sigreturn");  # 添加sigreturn中断入口
 
 # .global trace
 #exit:

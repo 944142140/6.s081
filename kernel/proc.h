@@ -104,4 +104,10 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
   uint64 syscall_trace;        // Mask for syscall tracing (添加的用于标识追踪system call
+
+  int alarm_interval;          // 时钟周期 0表示禁用
+  void(*alarm_handler)();      // 时钟回调函数
+  int alarm_ticks;             // 下次一时钟响起时候还剩下的ticks
+  struct trapframe *alarm_trapframe; // 时钟中断时刻的trapframe，用于中断处理完成后恢复原程序的正常执行
+  int alarm_goingoff;          // 是否有一个时钟回调正在执行且还未返回（用于防止在alarm_handler中途闹钟到期再次调用alarm_handler, 导致alarm_trapframe被覆盖）
 };

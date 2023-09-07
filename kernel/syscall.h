@@ -22,3 +22,5 @@
 #define SYS_close  21
 #define SYS_trace  22 // 在syscall.h中加入序号
 #define SYS_sysinfo 23 // 添加sysinfo的调用号
+#define SYS_sigalarm 24 // 添加sysinfo的调用号
+#define SYS_sigreturn 25 // 添加sysinfo的调用号

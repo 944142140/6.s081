@@ -157,6 +157,7 @@ UPROGS=\
 	$U/_uptime\
 	$U/_trace\
 	$U/_sysinfotest\
+	$U/_bttest\
 
 
 ifeq ($(LAB),syscall)
