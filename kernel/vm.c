@@ -5,7 +5,7 @@
 #include "riscv.h"
 #include "defs.h"
 #include "fs.h"
-
+#include "proc.h"
 /*
  * the kernel's page table.
  */
@@ -439,4 +439,16 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
   } else {
     return -1;
   }
+}
+
+// 判断一个虚拟地址是不是一个需要被分配的lazy地址
+// 具体规则 1. 在[0, p->sz）内(进程的内存范围) 2.(不能是guard page， 碰到guard page应该直接异常)
+// 3.页表项必须不存在
+int uvmshouldtouch(uint64 va) {
+  pte_t *pte;
+  struct proc *p = myproc();
+
+  return va < p->sz
+    && PGROUNDDOWN(va) != r_sp()
+    && ((pte = walk(p->pagetable, va, 0)) == 0 || ((*pte & PTE_V) == 0));
 }

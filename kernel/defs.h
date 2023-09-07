@@ -173,6 +173,9 @@ uint64          walkaddr(pagetable_t, uint64);
 int             copyout(pagetable_t, uint64, char *, uint64);
 int             copyin(pagetable_t, char *, uint64, uint64);
 int             copyinstr(pagetable_t, char *, uint64, uint64);
+void            uvmlazytouch(uint64 va);   // 给却页地址分配物理页并映射
+int             uvmshouldtouch(uint64 va); // 判断缺页地址是否是之前lazy allocation
+
 
 // plic.c
 void            plicinit(void);

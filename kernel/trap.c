@@ -68,9 +68,14 @@ usertrap(void)
   } else if((which_dev = devintr()) != 0){
     // ok
   } else {
+    uint64 va = r_stval();
+    if ((r_scause() == 13 || r_scause() == 15) && uvmshouldtouch(va)) { // 缺页异常， 而且缺页的地方发生过lazy allocation
+      uvmlazytouch(va); // 分配物理内存并在页表创建映射
+    } else { // 其他情况 kill process 并抛出error
     printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
     printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
     p->killed = 1;
+  }
   }
 
   if(p->killed)
