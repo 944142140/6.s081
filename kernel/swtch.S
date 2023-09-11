@@ -3,7 +3,7 @@
 #   void swtch(struct context *old, struct context *new);
 # 
 # Save current registers in old. Load from new.	
-
+#参考switch.S
 
 .globl swtch
 swtch:
