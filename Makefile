@@ -157,7 +157,8 @@ UPROGS=\
 	$U/_uptime\
 	$U/_trace\
 	$U/_sysinfotest\
-
+	$U/_cowtest\
+	
 
 ifeq ($(LAB),syscall)
 UPROGS += \

@@ -64,6 +64,8 @@ void*           kalloc(void);
 void            kfree(void *);
 void            kinit(void);
 uint64          count_free_mem(void); // 定义计算内存函数
+void            krefpage(void *);     // 增加为页增加引用计数函数
+void            *kcopy_n_deref(void *pa); // 增加位lazy页分配物理页函数
 
 // log.c
 void            initlog(int, struct superblock*);
@@ -173,6 +175,8 @@ uint64          walkaddr(pagetable_t, uint64);
 int             copyout(pagetable_t, uint64, char *, uint64);
 int             copyin(pagetable_t, char *, uint64, uint64);
 int             copyinstr(pagetable_t, char *, uint64, uint64);
+int             uvmcheckcowpage(uint64 va); // 检查是否lazy页
+int             uvmcowcopy(uint64 va);// 分配物理页给lazy页
 
 // plic.c
 void            plicinit(void);
