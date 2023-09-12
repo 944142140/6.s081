@@ -1,37 +1,52 @@
 #include "kernel/types.h"
+#include "kernel/stat.h"
 #include "user/user.h"
 
-int main (int argc, char* argv[]) {
-   int p1[2]; // pipe会得到一个长度2的数组，一般p[0]为用于读数据的fd p[1] 为写数据fd。
-   int p2[2]; // 定义两个管道数组，用于父子进程通信
-   pipe(p1); // 创建父进程向子进程通信的管道
-   pipe(p2); // 创建子进程向父进程通信的管道
-   char buf[1];
-   int pid = fork();
+#define N 5
+char buf[N];
 
-   if (pid == 0) { // 子进程通信
-      close(p1[1]); // 关闭父进程向子进程写通道，要读数据
-      close(p2[0]); // 关闭子进程向父进程读通道
+void
+pong(int *parent_to_child, int *child_to_parent) {
+  if (read(parent_to_child[0], buf, N) < 0) {
+    printf("read failed\n");
+  }
+  printf("%d: received %s\n", getpid(), buf);
+  if (write(child_to_parent[1], "pong", 4) != 4) {
+    printf("write failed\n");
+  }
+}
 
-      read(p1[0], buf, 1);
-      printf("%d: received ping\n", getpid());
-      write(p2[1], "!", 1);
-      close(p1[0]);
-      close(p2[1]);
-      exit(0);
+void
+ping(int *parent_to_child, int *child_to_parent) {
+  
+  if (write(parent_to_child[1], "ping", 4) != 4) {
+    printf("write failed\n");
+  }
+  if (read(child_to_parent[0], buf, N) < 0) {
+    printf("read failed\n");
+  }
+  printf("%d: received %s\n", getpid(), buf);
+}
 
-   }
-   else {
-      close(p1[0]); // 关闭父进程向子进程写通道，要读数据
-      close(p2[1]); // 关闭子进程向父进程读通道
+int
+main(int argc, char *argv[])
+{
+  int parent_to_child[2];
+  int child_to_parent[2];
 
-      write(p1[1], "!", 1);
-      read(p2[0], buf, 1);
-      printf("%d: received pong\n", getpid());
-      
-      close(p1[1]);
-      close(p2[0]);
-      exit(0);
-   }
-   
+  int pid;
+
+  if (pipe(parent_to_child) < 0 || pipe(child_to_parent) < 0) {
+    printf("pipe failed\n");
+  }
+  if ((pid = fork()) < 0) {
+    printf("fork failed\n");
+  }
+  if (pid == 0) {
+    pong(parent_to_child, child_to_parent);
+  } else {
+    ping(parent_to_child, child_to_parent);
+  }
+  
+  exit(0);
 }
