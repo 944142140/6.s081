@@ -82,6 +82,18 @@ struct trapframe {
 
 enum procstate { UNUSED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
+struct vma {
+  int valid;
+  uint64 vastart;
+  uint64 sz;
+  struct file *f;
+  int prot;
+  int flags;
+  uint64 offset;
+};
+
+#define NVMA 16
+
 // Per-process state
 struct proc {
   struct spinlock lock;
@@ -103,5 +115,5 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
-  uint64 syscall_trace;        // Mask for syscall tracing (添加的用于标识追踪system call
+  struct vma vmas[NVMA];         // virtual memory area
 };
