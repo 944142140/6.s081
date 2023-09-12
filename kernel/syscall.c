@@ -106,6 +106,7 @@ extern uint64 sys_write(void);
 extern uint64 sys_uptime(void);
 extern uint64 sys_trace(void); // 声明调用函数
 extern uint64 sys_sysinfo(void); // 声明调用函数
+extern uint64 sys_symlink(void);
 
 static uint64 (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -131,6 +132,7 @@ static uint64 (*syscalls[])(void) = {
 [SYS_close]   sys_close,
 [SYS_trace]   sys_trace, // here
 [SYS_sysinfo]   sys_sysinfo, // here
+[SYS_symlink] sys_symlink,
 };
 
 // 用作打印调用名的数组

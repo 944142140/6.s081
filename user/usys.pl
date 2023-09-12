@@ -37,8 +37,8 @@ entry("sbrk");
 entry("sleep");
 entry("uptime");
 entry("trace"); # here 添加systrace的入口中断
-entry("sysinfo")  # 添加sysinfo入口
-
+entry("sysinfo");  # 添加sysinfo入口
+entry("symlink");
 # .global trace
 #exit:
 # li a7, SYS_trace
