@@ -104,8 +104,6 @@ extern uint64 sys_unlink(void);
 extern uint64 sys_wait(void);
 extern uint64 sys_write(void);
 extern uint64 sys_uptime(void);
-extern uint64 sys_trace(void); // 声明调用函数
-extern uint64 sys_sysinfo(void); // 声明调用函数
 
 static uint64 (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -129,36 +127,7 @@ static uint64 (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
-[SYS_trace]   sys_trace, // here
-[SYS_sysinfo]   sys_sysinfo, // here
 };
-
-// 用作打印调用名的数组
-const char *syscall_names[] = {
-[SYS_fork]    "fork",
-[SYS_exit]    "exit",
-[SYS_wait]    "wait",
-[SYS_pipe]    "pipe",
-[SYS_read]    "read",
-[SYS_kill]    "kill",
-[SYS_exec]    "exec",
-[SYS_fstat]   "fstat",
-[SYS_chdir]   "chdir",
-[SYS_dup]     "dup",
-[SYS_getpid]  "getpid",
-[SYS_sbrk]    "sbrk",
-[SYS_sleep]   "sleep",
-[SYS_uptime]  "uptime",
-[SYS_open]    "open",
-[SYS_write]   "write",
-[SYS_mknod]   "mknod",
-[SYS_unlink]  "unlink",
-[SYS_link]    "link",
-[SYS_mkdir]   "mkdir",
-[SYS_close]   "close",
-[SYS_trace]   "trace",
-};
-
 
 void
 syscall(void)
@@ -167,15 +136,11 @@ syscall(void)
   struct proc *p = myproc();
 
   num = p->trapframe->a7;
-  if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {  //如果系统调用编号有效
-    p->trapframe->a0 = syscalls[num](); // 通过调用系统调用编号，就获取到系统调用处理函数的指针，调用并将返回值存到用户a0寄存器中
-    if ((p->syscall_trace >> num) & 1) { // 位与运算就知道num系统调用有没有启动跟踪
-      printf("%d: syscall %s -> %d\n", p->pid, syscall_names[num], p->trapframe->a0); // syscall_names是syscall编号到syscall的名字映射表
-    }
+  if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+    p->trapframe->a0 = syscalls[num]();
   } else {
     printf("%d %s: unknown sys call %d\n",
             p->pid, p->name, num);
     p->trapframe->a0 = -1;
   }
-
 }

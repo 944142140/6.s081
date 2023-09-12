@@ -36,17 +36,3 @@ entry("getpid");
 entry("sbrk");
 entry("sleep");
 entry("uptime");
-entry("trace"); # here 添加systrace的入口中断
-entry("sysinfo")  # 添加sysinfo入口
-
-# .global trace
-#exit:
-# li a7, SYS_trace
-# ecall
-# ret
-
-# .global trace
-#exit:
-# li a7, SYS_sysinfo
-# ecall
-# ret

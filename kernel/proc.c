@@ -126,7 +126,6 @@ found:
   memset(&p->context, 0, sizeof(p->context));
   p->context.ra = (uint64)forkret;
   p->context.sp = p->kstack + PGSIZE;
-  p->syscall_trace = 0;   // 在此处添加trace初始值0 fork          ！！！！！
 
   return p;
 }
@@ -291,8 +290,6 @@ fork(void)
   np->cwd = idup(p->cwd);
 
   safestrcpy(np->name, p->name, sizeof(p->name));
-
-  np->syscall_trace = p->syscall_trace; //HERE!! 子进程继承父进程的trace号 ！！！！
 
   pid = np->pid;
 
@@ -467,9 +464,12 @@ scheduler(void)
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
     
-    int found = 0;
+    int nproc = 0;
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
+      if(p->state != UNUSED) {
+        nproc++;
+      }
       if(p->state == RUNNABLE) {
         // Switch to chosen process.  It is the process's job
         // to release its lock and then reacquire it
@@ -481,12 +481,10 @@ scheduler(void)
         // Process is done running for now.
         // It should have changed its p->state before coming back.
         c->proc = 0;
-
-        found = 1;
       }
       release(&p->lock);
     }
-    if(found == 0) {
+    if(nproc <= 2) {   // only init and sh exist
       intr_on();
       asm volatile("wfi");
     }
@@ -695,20 +693,4 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
-}
-
-
-// 实现计算进程数量函数
-
-uint64
-count_process(void) { // added function for counting used process slots (lab2)
-  uint64 cnt = 0;
-  for(struct proc *p = proc; p < &proc[NPROC]; p++) {
-    // acquire(&p->lock);
-    // 不需要锁进程 proc 结构，只需要读取进程列表，不需要写
-    if(p->state != UNUSED) { // 不是 UNUSED 的进程位，就是已经分配的
-        cnt++;
-    }
-  }
-  return cnt;
 }
